@@ -39,13 +39,13 @@ app.MapGet("/Users", async (CV_DBContext dbContext) =>
     }
 });
 
-//Read User by ID
-app.MapGet("/users/{id}", async (CV_DBContext dbContext, int id) =>
+//Read User by UserName
+app.MapGet("/users/{username}", async (CV_DBContext dbContext, string userName) =>
 {
     try
     {
         var user = await dbContext.Users.Include(u => u.Skills).Include(u => u.Projects)
-                                         .FirstOrDefaultAsync(x => x.Id == id);
+                                         .FirstOrDefaultAsync(x => x.Username == userName);
         if (user != null)
         {
             return Results.Ok(user);
