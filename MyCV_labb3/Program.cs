@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using MyCV_labb3.DBContext;
 using MyCV_labb3.Model;
@@ -87,15 +85,10 @@ app.MapPut("/users", async (CV_DBContext dbContext, UserModel user) =>
 
         if (userToUpdate != null)
         {
-            // Update user properties here
             userToUpdate.FirstName = user.FirstName;
             userToUpdate.LastName = user.LastName;
-            userToUpdate.Username = user.Username;
-            //userToUpdate.Password = user.Password;
-            userToUpdate.Email = user.Email;
-            //userToUpdate.Role = user.Role;
-
-            //Update skills
+            userToUpdate.Username = user.Username;           
+            userToUpdate.Email = user.Email;          
 
             if (user.Skills != null)
             {
@@ -108,45 +101,35 @@ app.MapPut("/users", async (CV_DBContext dbContext, UserModel user) =>
                     else
                     {
                         userToUpdate.Skills.Add(skill);
-                    }
-                    //var skillToUpdate = userToUpdate.Skills.FirstOrDefault(s => s.SkillId == skill.SkillId);
-                    //if (skillToUpdate != null)
-                    //{
-                    //    skillToUpdate.YearsOfExperience = skill.YearsOfExperience;
-                    //    skillToUpdate.SkillName = skill.SkillName;
-                    //    skillToUpdate.SkillLevel = skill.SkillLevel;
-                    //    userToUpdate.Skills.Add(skillToUpdate);
-                    //}
-                    //else
-                    //{
-                    //    var newSkilltoAdd = new Skill();
-                    //    newSkilltoAdd.SkillName = skill.SkillName;
-                    //    newSkilltoAdd.SkillLevel = skill.SkillLevel;
-                    //    newSkilltoAdd.YearsOfExperience = skill.YearsOfExperience;
-                    //    userToUpdate.Skills.Add(newSkilltoAdd);
-                    //}
+                    }                  
                 }
-            }
-
-            //Update project
+            }          
             if (user.Projects != null)
             {
                 foreach (var project in user.Projects)
                 {
-                    var projectToUpdate = userToUpdate.Projects.FirstOrDefault(p => p.ProjectId == project.ProjectId);
-                    if (projectToUpdate != null)
+                    if(userToUpdate.Projects.Any(p => p.ProjectId== project.ProjectId))
                     {
-                        projectToUpdate.ProjectName = project.ProjectName;
-                        projectToUpdate.ProjectDescription = project.ProjectDescription;
-                        userToUpdate.Projects.Add(projectToUpdate);
+                        userToUpdate.Projects.Remove(project);
                     }
                     else
                     {
-                        var newProjectToAdd = new Project();
-                        newProjectToAdd.ProjectName = project.ProjectName;
-                        newProjectToAdd.ProjectDescription = project.ProjectDescription;
-                        userToUpdate.Projects.Add(newProjectToAdd);
+                        userToUpdate.Projects.Add(project);
                     }
+                    //var projectToUpdate = userToUpdate.Projects.FirstOrDefault(p => p.ProjectId == project.ProjectId);
+                    //if (projectToUpdate != null)
+                    //{
+                    //    projectToUpdate.ProjectName = project.ProjectName;
+                    //    projectToUpdate.ProjectDescription = project.ProjectDescription;
+                    //    userToUpdate.Projects.Add(projectToUpdate);
+                    //}
+                    //else
+                    //{
+                    //    var newProjectToAdd = new Project();
+                    //    newProjectToAdd.ProjectName = project.ProjectName;
+                    //    newProjectToAdd.ProjectDescription = project.ProjectDescription;
+                    //    userToUpdate.Projects.Add(newProjectToAdd);
+                    //}
                 }
             }
             await dbContext.SaveChangesAsync();
@@ -163,43 +146,7 @@ app.MapPut("/users", async (CV_DBContext dbContext, UserModel user) =>
     }
 });
 
-
-
-////Delete user
-//app.MapDelete("/users/{id}", async (CV_DBContext dbContext, int id) =>
-//{
-//    try
-//    {
-//        var userToDelete = await dbContext.Users.Include(s=>s.Skills).Include(p => p.Projects).FirstOrDefaultAsync(u => u.Id == id);
-//        if(userToDelete != null)
-//        {
-//            // Remove associated skills
-//            foreach (var skill in userToDelete.Skills)
-//            {
-//                dbContext.Skills.Remove(skill);
-//            }
-
-//            // Remove associated projects
-//            foreach (var project in userToDelete.Projects)
-//            {
-//                dbContext.Projects.Remove(project);
-//            }
-//            dbContext.Users.Remove(userToDelete);
-//            await dbContext.SaveChangesAsync();
-//            return Results.Ok(userToDelete);
-//        }
-//        else
-//        {
-//            return Results.NotFound("No user found with this ID");
-//        }
-//    }
-//    catch
-//    {
-
-//        return Results.Problem("Server error"); ;
-//    }
-
-//});
+/***********************************  Skill ********************************/
 
 //Add skill
 app.MapPost("/addskill/", async (CV_DBContext dbContext, Skill skill) =>
@@ -212,11 +159,10 @@ app.MapPost("/addskill/", async (CV_DBContext dbContext, Skill skill) =>
     }
     catch
     {
-
         return Results.Problem("Server error"); ;
     }
-
 });
+
 
 //Update skill
 app.MapPut("/updateskill/", async (CV_DBContext dbContext, Skill skill) =>
@@ -226,36 +172,80 @@ app.MapPut("/updateskill/", async (CV_DBContext dbContext, Skill skill) =>
         var skillToUpdate = await dbContext.Skills.FirstOrDefaultAsync(item => item.SkillId == skill.SkillId);
         skillToUpdate.SkillName = skill.SkillName;
         skillToUpdate.SkillLevel = skill.SkillLevel;
-        skillToUpdate.YearsOfExperience = skill.YearsOfExperience;
-        //dbContext.Skills.Update(skillToDelete);
+        skillToUpdate.YearsOfExperience = skill.YearsOfExperience;       
         await dbContext.SaveChangesAsync();
         return Results.Ok(skillToUpdate);
     }
     catch
     {
-
         return Results.Problem("Server error"); ;
     }
-
 });
 
-
 //Delete skill
-app.MapDelete("/users/{id}", async (CV_DBContext dbContext, int id) =>
+app.MapDelete("/skills/{skillId}", async (CV_DBContext dbContext, int skillId) =>
 {
     try
     {
-        var skillToDelete = await dbContext.Skills.FirstOrDefaultAsync(item => item.SkillId == id);
-        dbContext.Skills.Remove(skillToDelete); 
+        var skillToDelete = await dbContext.Skills.FirstOrDefaultAsync(item => item.SkillId == skillId);
+        dbContext.Skills.Remove(skillToDelete);
         await dbContext.SaveChangesAsync();
-        return Results.Ok(skillToDelete);        
+        return Results.Ok(skillToDelete);
     }
     catch
     {
-
         return Results.Problem("Server error"); ;
     }
+});
 
+/***********************************  Project ********************************/
+
+//Add project
+app.MapPost("/addproject/", async (CV_DBContext dbContext, Project project) =>
+{
+    try
+    {
+        dbContext.Projects.Add(project);
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(project);
+    }
+    catch
+    {
+        return Results.Problem("Server error"); ;
+    }
+});
+
+// Update Project
+app.MapPut("/updateproject/", async (CV_DBContext dbContext, Project project) =>
+{
+    try
+    {
+        var projectToUpdate = await dbContext.Projects.FirstOrDefaultAsync(item => item.ProjectId == project.ProjectId);
+        projectToUpdate.ProjectName = project.ProjectName;
+        projectToUpdate.ProjectDescription = project.ProjectDescription;
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(projectToUpdate);
+    }
+    catch
+    {
+        return Results.Problem("Server error"); ;
+    }
+});
+
+//Delete project
+app.MapDelete("/projects/{projectId}", async (CV_DBContext dbContext, int projectId) =>
+{
+    try
+    {
+        var projectToDelete = await dbContext.Projects.FirstOrDefaultAsync(item => item.ProjectId == projectId);
+        dbContext.Projects.Remove(projectToDelete);
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(projectToDelete);
+    }
+    catch
+    {
+        return Results.Problem("Server error"); ;
+    }
 });
 
 app.Run();
