@@ -91,9 +91,9 @@ app.MapPut("/users", async (CV_DBContext dbContext, UserModel user) =>
             userToUpdate.FirstName = user.FirstName;
             userToUpdate.LastName = user.LastName;
             userToUpdate.Username = user.Username;
-            userToUpdate.Password = user.Password;
+            //userToUpdate.Password = user.Password;
             userToUpdate.Email = user.Email;
-            userToUpdate.Role = user.Role;
+            //userToUpdate.Role = user.Role;
 
             //Update skills
 
@@ -101,22 +101,30 @@ app.MapPut("/users", async (CV_DBContext dbContext, UserModel user) =>
             {
                 foreach (var skill in user.Skills)
                 {
-                    var skillToUpdate = userToUpdate.Skills.FirstOrDefault(s => s.SkillId == skill.SkillId);
-                    if (skillToUpdate != null)
+                    if(userToUpdate.Skills.Any(s=>s.SkillId == skill.SkillId))
                     {
-                        skillToUpdate.YearsOfExperience = skill.YearsOfExperience;
-                        skillToUpdate.SkillName = skill.SkillName;
-                        skillToUpdate.SkillLevel = skill.SkillLevel;
-                        userToUpdate.Skills.Add(skillToUpdate);
+                        userToUpdate.Skills.Remove(skill);
                     }
                     else
                     {
-                        var newSkilltoAdd = new Skill();
-                        newSkilltoAdd.SkillName = skill.SkillName;
-                        newSkilltoAdd.SkillLevel = skill.SkillLevel;
-                        newSkilltoAdd.YearsOfExperience = skill.YearsOfExperience;
-                        userToUpdate.Skills.Add(newSkilltoAdd);
+                        userToUpdate.Skills.Add(skill);
                     }
+                    //var skillToUpdate = userToUpdate.Skills.FirstOrDefault(s => s.SkillId == skill.SkillId);
+                    //if (skillToUpdate != null)
+                    //{
+                    //    skillToUpdate.YearsOfExperience = skill.YearsOfExperience;
+                    //    skillToUpdate.SkillName = skill.SkillName;
+                    //    skillToUpdate.SkillLevel = skill.SkillLevel;
+                    //    userToUpdate.Skills.Add(skillToUpdate);
+                    //}
+                    //else
+                    //{
+                    //    var newSkilltoAdd = new Skill();
+                    //    newSkilltoAdd.SkillName = skill.SkillName;
+                    //    newSkilltoAdd.SkillLevel = skill.SkillLevel;
+                    //    newSkilltoAdd.YearsOfExperience = skill.YearsOfExperience;
+                    //    userToUpdate.Skills.Add(newSkilltoAdd);
+                    //}
                 }
             }
 
@@ -157,33 +165,71 @@ app.MapPut("/users", async (CV_DBContext dbContext, UserModel user) =>
 
 
 
-//Delete user
-app.MapDelete("/users/{id}", async (CV_DBContext dbContext, int id) =>
+////Delete user
+//app.MapDelete("/users/{id}", async (CV_DBContext dbContext, int id) =>
+//{
+//    try
+//    {
+//        var userToDelete = await dbContext.Users.Include(s=>s.Skills).Include(p => p.Projects).FirstOrDefaultAsync(u => u.Id == id);
+//        if(userToDelete != null)
+//        {
+//            // Remove associated skills
+//            foreach (var skill in userToDelete.Skills)
+//            {
+//                dbContext.Skills.Remove(skill);
+//            }
+
+//            // Remove associated projects
+//            foreach (var project in userToDelete.Projects)
+//            {
+//                dbContext.Projects.Remove(project);
+//            }
+//            dbContext.Users.Remove(userToDelete);
+//            await dbContext.SaveChangesAsync();
+//            return Results.Ok(userToDelete);
+//        }
+//        else
+//        {
+//            return Results.NotFound("No user found with this ID");
+//        }
+//    }
+//    catch
+//    {
+
+//        return Results.Problem("Server error"); ;
+//    }
+
+//});
+
+//Add skill
+app.MapPost("/addskill/", async (CV_DBContext dbContext, Skill skill) =>
+{
+    try
+    {        
+        dbContext.Skills.Add(skill);
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(skill);
+    }
+    catch
+    {
+
+        return Results.Problem("Server error"); ;
+    }
+
+});
+
+//Update skill
+app.MapPut("/updateskill/", async (CV_DBContext dbContext, Skill skill) =>
 {
     try
     {
-        var userToDelete = await dbContext.Users.Include(s=>s.Skills).Include(p => p.Projects).FirstOrDefaultAsync(u => u.Id == id);
-        if(userToDelete != null)
-        {
-            // Remove associated skills
-            foreach (var skill in userToDelete.Skills)
-            {
-                dbContext.Skills.Remove(skill);
-            }
-
-            // Remove associated projects
-            foreach (var project in userToDelete.Projects)
-            {
-                dbContext.Projects.Remove(project);
-            }
-            dbContext.Users.Remove(userToDelete);
-            await dbContext.SaveChangesAsync();
-            return Results.Ok(userToDelete);
-        }
-        else
-        {
-            return Results.NotFound("No user found with this ID");
-        }
+        var skillToUpdate = await dbContext.Skills.FirstOrDefaultAsync(item => item.SkillId == skill.SkillId);
+        skillToUpdate.SkillName = skill.SkillName;
+        skillToUpdate.SkillLevel = skill.SkillLevel;
+        skillToUpdate.YearsOfExperience = skill.YearsOfExperience;
+        //dbContext.Skills.Update(skillToDelete);
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(skillToUpdate);
     }
     catch
     {
@@ -194,6 +240,23 @@ app.MapDelete("/users/{id}", async (CV_DBContext dbContext, int id) =>
 });
 
 
+//Delete skill
+app.MapDelete("/users/{id}", async (CV_DBContext dbContext, int id) =>
+{
+    try
+    {
+        var skillToDelete = await dbContext.Skills.FirstOrDefaultAsync(item => item.SkillId == id);
+        dbContext.Skills.Remove(skillToDelete); 
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(skillToDelete);        
+    }
+    catch
+    {
+
+        return Results.Problem("Server error"); ;
+    }
+
+});
 
 app.Run();
 

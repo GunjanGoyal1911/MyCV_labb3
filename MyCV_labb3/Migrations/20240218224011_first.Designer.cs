@@ -12,8 +12,8 @@ using MyCV_labb3.DBContext;
 namespace MyCV_labb3.Migrations
 {
     [DbContext(typeof(CV_DBContext))]
-    [Migration("20240211141917_secondmigration")]
-    partial class secondmigration
+    [Migration("20240218224011_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,14 +97,6 @@ namespace MyCV_labb3.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

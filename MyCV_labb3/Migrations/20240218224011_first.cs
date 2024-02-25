@@ -5,13 +5,13 @@
 namespace MyCV_labb3.Migrations
 {
     /// <inheritdoc />
-    public partial class firstmigration : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "_Users",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -19,17 +19,15 @@ namespace MyCV_labb3.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "_Projects",
+                name: "Projects",
                 columns: table => new
                 {
                     ProjectId = table.Column<int>(type: "int", nullable: false)
@@ -40,16 +38,16 @@ namespace MyCV_labb3.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Projects", x => x.ProjectId);
+                    table.PrimaryKey("PK_Projects", x => x.ProjectId);
                     table.ForeignKey(
-                        name: "FK__Projects__Users_UserModelId",
+                        name: "FK_Projects_Users_UserModelId",
                         column: x => x.UserModelId,
-                        principalTable: "_Users",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "_Skills",
+                name: "Skills",
                 columns: table => new
                 {
                     SkillId = table.Column<int>(type: "int", nullable: false)
@@ -61,22 +59,22 @@ namespace MyCV_labb3.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Skills", x => x.SkillId);
+                    table.PrimaryKey("PK_Skills", x => x.SkillId);
                     table.ForeignKey(
-                        name: "FK__Skills__Users_UserModelId",
+                        name: "FK_Skills_Users_UserModelId",
                         column: x => x.UserModelId,
-                        principalTable: "_Users",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX__Projects_UserModelId",
-                table: "_Projects",
+                name: "IX_Projects_UserModelId",
+                table: "Projects",
                 column: "UserModelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX__Skills_UserModelId",
-                table: "_Skills",
+                name: "IX_Skills_UserModelId",
+                table: "Skills",
                 column: "UserModelId");
         }
 
@@ -84,13 +82,13 @@ namespace MyCV_labb3.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "_Projects");
+                name: "Projects");
 
             migrationBuilder.DropTable(
-                name: "_Skills");
+                name: "Skills");
 
             migrationBuilder.DropTable(
-                name: "_Users");
+                name: "Users");
         }
     }
 }

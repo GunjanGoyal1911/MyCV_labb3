@@ -12,8 +12,8 @@ using MyCV_labb3.DBContext;
 namespace MyCV_labb3.Migrations
 {
     [DbContext(typeof(CV_DBContext))]
-    [Migration("20240209143900_firstmigration")]
-    partial class firstmigration
+    [Migration("20240223142930_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,7 +48,7 @@ namespace MyCV_labb3.Migrations
 
                     b.HasIndex("UserModelId");
 
-                    b.ToTable("_Projects");
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("MyCV_labb3.Model.Skill", b =>
@@ -77,7 +77,7 @@ namespace MyCV_labb3.Migrations
 
                     b.HasIndex("UserModelId");
 
-                    b.ToTable("_Skills");
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("MyCV_labb3.Model.UserModel", b =>
@@ -100,21 +100,13 @@ namespace MyCV_labb3.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("_Users");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("MyCV_labb3.Model.Project", b =>
